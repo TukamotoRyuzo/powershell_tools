@@ -13,10 +13,12 @@
     - 0列目、1列目だけを削除した`target_remain.csv`
 
 ```powershell
-split_csv.ps1 `
+./split_csv.ps1 `
 -Src "src.csv" `
--Delimiter "," `
+-Delimiter "," ` #区切り文字を指定しない場合は、先頭から0文字目、1文字目を抽出する
 -ExtractColumnNumber (0,1) `
 -OutFileForExtractColumn "target_extract.csv" `
--OutFileForRemainColumn "target_remain.csv"
+-OutFileForRemainColumn "target_remain.csv" `
+-InputEncoding "default" ` #入力ファイルの文字コード("default"=SJIS,指定しないときUTF8)
+-OutputEncoding "default" ` #出力ファイルの文字コード("default"=SJIS,指定しないときUTF8)
 ```

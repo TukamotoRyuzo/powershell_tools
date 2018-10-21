@@ -1,15 +1,24 @@
 Param(
   [parameter(mandatory=$true)][string]$Src,
-  [parameter(mandatory=$true)][string]$Delimiter,  
+  [parameter(mandatory=$false)][string]$Delimiter="",  
   [parameter(mandatory=$true)][array]$ExtractColumnNumber,
   [parameter(mandatory=$true)][string]$OutFileForExtractColumn,
-  [parameter(mandatory=$true)][string]$OutFileForRemainColumn
+  [parameter(mandatory=$true)][string]$OutFileForRemainColumn,
+  [parameter(mandatory=$false)][string]$InputEncoding="UTF8",
+  [parameter(mandatory=$false)][string]$OutputEncoding="UTF8"
 )
 
-$csv = Get-Content $Src
+$csv = Get-Content $Src -Encoding $InputEncoding
 
 # csvファイルの列数を調べる
-$column_size = $csv[-1].split($Delimiter).length
+$column_size = 0
+
+if ($Delimiter -eq "") {
+    $column_size = $csv[-1].length
+}
+else {
+    $column_size = $csv[-1].split($Delimiter).length
+}
 
 foreach ($column_number in $ExtractColumnNumber) {
     # csvの列数を超える列番号が指定されたら警告吐いて終了
@@ -28,21 +37,28 @@ if (Test-Path $OutFileForRemainColumn) {
 
 # 指定された列番号のカラムを抜き出して別のcsvファイルに保存する
 foreach ($row in $csv) {
-    $column_list = $row.split($Delimiter)
     $count = 0
+    $column_list = ""
+
+    if ($Delimiter -eq "") {
+        $column_list = $row.ToCharArray()
+    }
+    else {
+        $column_list = $row.split($Delimiter)
+    }
 
     foreach ($column in $column_list) {
         $column += $Delimiter
         # 指定された列番号なら、それ用のcsvに吐く
         if ($count -in $ExtractColumnNumber) {
-            $column | Out-File $OutFileForExtractColumn -Append -NoNewLine
+            $column | Out-File $OutFileForExtractColumn -Append -NoNewLine -Encoding $OutputEncoding
         }
         else {
-            $column | Out-File $OutFileForRemainColumn -Append -NoNewLine
+            $column | Out-File $OutFileForRemainColumn -Append -NoNewLine -Encoding $OutputEncoding
         }
         $count++
     }
 
-    "" | Out-File $OutFileForExtractColumn -Append
-    "" | Out-File $OutFileForRemainColumn -Append
+    "" | Out-File $OutFileForExtractColumn -Append -Encoding $OutputEncoding
+    "" | Out-File $OutFileForRemainColumn -Append -Encoding $OutputEncoding
 }
