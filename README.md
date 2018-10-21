@@ -9,8 +9,8 @@
   - 指定列だけを削除した`.csv`
 - (例)
   - `src.csv`（区切り文字は`","`）から、以下のファイルを作成
-    - 0列目、1列目だけを抽出して`target_extract.csv`
-    - 0列目、1列目だけを削除して`target_remain.csv`
+    - 0列目、1列目だけを抽出した`target_extract.csv`
+    - 0列目、1列目だけを削除した`target_remain.csv`
 
 ```powershell
 split_csv.ps1 `
